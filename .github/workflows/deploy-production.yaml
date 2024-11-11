@@ -1,0 +1,56 @@
+name: Auto deploy express-cash-backend in VPS
+
+on:
+  push:
+    branches:
+      - production
+    paths:
+      - '.github/workflows/**'
+      - 'index.html'
+      - 'package.json'
+      - 'public/**'
+      - 'scripts/**'
+      - 'src/**'
+      - 'vite.config.js'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Deploy using ssh
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.PRODUCTION_SSH_HOST }}
+          username: ${{ secrets.PRODUCTION_SSH_USERNAME }}
+          key: ${{ secrets.PRODUCTION_SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd /root/repos/express-cash-backend
+            git pull origin production
+            cat <<EOF > .env
+            NODE_ENV=production
+            LOG_LEVEL=production
+            TYPEORM_HOST=${{ secrets.TYPEORM_HOST }}
+            TYPEORM_PORT=${{ secrets.TYPEORM_PORT }}
+            TYPEORM_USERNAME=${{ secrets.TYPEORM_USERNAME }}
+            TYPEORM_PASSWORD=${{ secrets.TYPEORM_PASSWORD }}
+            TYPEORM_DB_NAME=${{ secrets.TYPEORM_DB_NAME }}
+            NODEMAILER_HOST=${{ secrets.NODEMAILER_HOST }}
+            NODEMAILER_PORT=${{ secrets.NODEMAILER_PORT }}
+            NODEMAILER_USER=${{ secrets.NODEMAILER_USER }}
+            NODEMAILER_PASS=${{ secrets.NODEMAILER_PASS }}
+            NODEMAILER_FROM=${{ secrets.NODEMAILER_FROM }}
+            JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
+            JWT_SECRET_KEY_REFRESH=${{ secrets.JWT_SECRET_KEY_REFRESH }}
+            FORGET_PASSWORD_TOKEN_SECRET=${{ secrets.FORGET_PASSWORD_TOKEN_SECRET }}
+            FORGET_PASSWORD_TOKEN=${{ secrets.FORGET_PASSWORD_TOKEN }}
+            EOF
+            docker-compose build
+            docker-compose down -v
+            docker-compose up -d
