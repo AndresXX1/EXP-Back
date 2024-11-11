@@ -42,19 +42,7 @@ export class UserController {
   @ApiBearerAuth()
   @Get('')
   async getProfile(@GetUser() user: User) {
-    const userId = parseInt(`${user.id}`, 10);
-    const smarterData = await this.userService.getSmarterData(userId);
-    return { ok: true, user, smarter: smarterData };
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: 'Obtiene el estado de credito del usuario' })
-  @ApiBearerAuth()
-  @Get('getOffer/:platformId/:branchName')
-  async getOffer(@GetUser() user: User, @Param() params: { branchName: string; platformId: number }) {
-    const userId = parseInt(`${user.id}`, 10);
-    const smarterData = await this.userService.getOffer(userId, params.branchName, params.platformId);
-    return { ok: true, user, offer: smarterData };
+    return { ok: true, user };
   }
 
   @UseGuards(JwtAuthRolesGuard)
@@ -64,15 +52,6 @@ export class UserController {
   async getUsers() {
     const result = await this.userService.getUsers();
     return { ok: true, users: result };
-  }
-
-  @UseGuards(JwtAuthRolesGuard)
-  @SetMetadata(META_ROLES, [RoleAdminType.SUPER_ADMIN, RoleAdminType.ADMIN])
-  @ApiOperation({ summary: 'Activa o desactiva un usuario, solo admin' })
-  @Put('cuponizate/:userId')
-  async putUserCuponizate(@Param('userId') userId: number) {
-    const user = await this.userService.putUserCuponizate(userId);
-    return { ok: true, user: user };
   }
 
   @UseGuards(JwtAuthGuard)

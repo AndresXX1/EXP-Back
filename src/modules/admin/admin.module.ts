@@ -22,7 +22,6 @@ import { UserModule } from '@modules/user/user.module';
     }),
     TypeOrmModule.forFeature([Admin, SessionAdmin]),
     forwardRef(() => UserModule),
-    forwardRef(() => TimerModule),
   ],
   providers: [AdminService, JwtService, ConfigService, EmailService],
   controllers: [AdminController],
