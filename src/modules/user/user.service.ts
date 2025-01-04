@@ -7,7 +7,6 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 import { UpdateFirstDataDto } from './dto/first-data.dto';
 import { UpdateSecondDataDto } from './dto/second-data.dto';
-import axios from 'axios';
 import { AddressDto } from './dto/address.dto';
 import { updateUserDataDto } from './dto/update-user-data.dto';
 
